@@ -1,0 +1,19 @@
+{
+  "name": "sab-dice-oracle-predictor",
+  "version": "1.0.0",
+  "description": "High-accuracy glassmorphic dice roll verifier, history analyzer & prediction engine for sabdice.com",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "sabdice",
+    "dice-predictor",
+    "provably-fair",
+    "roll-verifier",
+    "glassmorphism"
+  ],
+  "author": "Jalapeno",
+  "license": "MIT"
+}
