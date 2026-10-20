@@ -4,6 +4,7 @@
   "description": "High-accuracy glassmorphic dice roll verifier, history analyzer & prediction engine for sabdice.com",
   "main": "server.js",
   "scripts": {
+    "build": "echo 'Build ready'",
     "start": "node server.js",
     "dev": "node server.js"
   },
