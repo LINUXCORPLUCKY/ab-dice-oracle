@@ -2,11 +2,9 @@
   "name": "sab-dice-oracle-predictor",
   "version": "1.0.0",
   "description": "High-accuracy glassmorphic dice roll verifier, history analyzer & prediction engine for sabdice.com",
-  "main": "server.js",
   "scripts": {
-    "build": "echo 'Build ready'",
-    "start": "node server.js",
-    "dev": "node server.js"
+    "build": "echo 'Static build ready'",
+    "dev": "node local_server.js"
   },
   "keywords": [
     "sabdice",
