@@ -129,6 +129,83 @@ body {
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  position: relative;
+}
+
+/* Center Branding: Traced HUB */
+.traced-hub-center {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 1.15rem 0.45rem 0.55rem;
+  background: rgba(255, 140, 0, 0.08);
+  border: 1px solid rgba(255, 160, 40, 0.4);
+  border-radius: 9999px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 0 25px rgba(255, 120, 0, 0.25), inset 0 0 15px rgba(255, 140, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.traced-hub-center:hover {
+  border-color: rgba(255, 175, 40, 0.7);
+  box-shadow: 0 0 35px rgba(255, 140, 0, 0.5), inset 0 0 20px rgba(255, 160, 40, 0.18);
+  transform: translateY(-1px);
+}
+
+.traced-logo-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #ff9d00;
+  box-shadow: 0 0 16px rgba(255, 157, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #09090b;
+  flex-shrink: 0;
+}
+
+.traced-logo-badge {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.traced-hub-center:hover .traced-logo-badge {
+  transform: scale(1.12);
+}
+
+.traced-info {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: 'Outfit', sans-serif;
+}
+
+.traced-text {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  background: linear-gradient(135deg, #ffffff 30%, #ffaa00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 25px rgba(255, 170, 0, 0.45);
+}
+
+.hub-badge {
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 0.22rem 0.55rem;
+  background: linear-gradient(135deg, #ff7a00, #ff3d00);
+  color: #fff;
+  border-radius: 6px;
+  letter-spacing: 0.12em;
+  box-shadow: 0 2px 10px rgba(255, 85, 0, 0.55);
+  text-transform: uppercase;
 }
 
 .brand {
@@ -1552,4 +1629,16 @@ body {
   letter-spacing: 0.08em;
   margin-top: 0.25rem;
 }
+
+@media (max-width: 900px) {
+  .glass-header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.2rem 1rem;
+  }
+  .traced-hub-center {
+    order: -1;
+  }
+}
+
 
