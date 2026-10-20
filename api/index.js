@@ -20,13 +20,15 @@ function proxySabDice(remotePath, res) {
     });
     remoteRes.pipe(res);
   }).on('error', err => {
-    res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    res.writeHead(502, { 
+      'Content-Type': 'application/json', 
+      'Access-Control-Allow-Origin': '*' 
+    });
     res.end(JSON.stringify({ error: 'Failed to reach sabdice.com', details: err.message }));
   });
 }
 
 module.exports = (req, res) => {
-  // CORS Preflight
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
@@ -36,44 +38,61 @@ module.exports = (req, res) => {
     return res.end();
   }
 
+  let pathname = '';
+  if (req.query && Array.isArray(req.query.path)) {
+    pathname = '/api/' + req.query.path.join('/');
+  } else if (req.query && typeof req.query.path === 'string') {
+    pathname = '/api/' + req.query.path;
+  } else {
+    const parsed = url.parse(req.url, true);
+    pathname = parsed.pathname || '';
+  }
+
   const parsedUrl = url.parse(req.url, true);
-  const pathname = parsedUrl.pathname || '';
+  const search = parsedUrl.search || '';
 
-  // API Proxy endpoints
-  if (pathname.startsWith('/api/sab/')) {
-    const targetPath = pathname.replace('/api/sab', '/api') + (parsedUrl.search || '');
-    return proxySabDice(targetPath, res);
+  if (pathname.includes('/verify/')) {
+    const rollId = pathname.split('/verify/')[1]?.trim();
+    if (rollId) {
+      return proxySabDice(`/api/rolls/verify/${encodeURIComponent(rollId)}`, res);
+    }
   }
 
-  if (pathname.startsWith('/api/verify/')) {
-    const rollId = pathname.replace('/api/verify/', '').trim();
-    return proxySabDice(`/api/rolls/verify/${encodeURIComponent(rollId)}`, res);
+  if (pathname.includes('/user/')) {
+    const playerId = pathname.split('/user/')[1]?.trim();
+    if (playerId) {
+      const query = search || '?limit=50';
+      return proxySabDice(`/api/rolls/users/${encodeURIComponent(playerId)}${query}`, res);
+    }
   }
 
-  if (pathname.startsWith('/api/user/')) {
-    const playerId = pathname.replace('/api/user/', '').trim();
-    const query = parsedUrl.search || '?limit=50';
-    return proxySabDice(`/api/rolls/users/${encodeURIComponent(playerId)}${query}`, res);
+  if (pathname.includes('/player-rolls/')) {
+    const username = pathname.split('/player-rolls/')[1]?.trim();
+    if (username) {
+      return proxySabDice(`/api/rolls/public?limit=100&q=${encodeURIComponent(username)}`, res);
+    }
   }
 
-  if (pathname === '/api/streamers') {
+  if (pathname.endsWith('/streamers')) {
     return proxySabDice('/api/streamers', res);
   }
-
-  if (pathname === '/api/streamers/live') {
+  if (pathname.endsWith('/streamers/live')) {
     return proxySabDice('/api/streamers/live', res);
   }
 
-  if (pathname === '/api/live-rolls') {
-    const query = parsedUrl.search || '?limit=100';
+  if (pathname.endsWith('/live-rolls')) {
+    const query = search || '?limit=100';
     return proxySabDice(`/api/rolls/public${query}`, res);
   }
 
-  if (pathname.startsWith('/api/player-rolls/')) {
-    const username = pathname.replace('/api/player-rolls/', '').trim();
-    return proxySabDice(`/api/rolls/public?limit=100&q=${encodeURIComponent(username)}`, res);
+  if (pathname.includes('/api/sab/')) {
+    const targetPath = pathname.replace('/api/sab', '/api') + search;
+    return proxySabDice(targetPath, res);
   }
 
-  res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-  res.end(JSON.stringify({ error: 'Endpoint not found' }));
+  res.writeHead(200, { 
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*'
+  });
+  res.end(JSON.stringify({ status: 'SabDice Proxy Operational' }));
 };
