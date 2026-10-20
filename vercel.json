@@ -3,16 +3,32 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "/api/[...path]"
+      "source": "/api/verify/:rollId",
+      "destination": "https://sabdice.com/api/rolls/verify/:rollId"
     },
     {
-      "source": "/",
-      "destination": "/public/index.html"
+      "source": "/api/user/:playerId",
+      "destination": "https://sabdice.com/api/rolls/users/:playerId"
     },
     {
-      "source": "/((?!api).*)",
-      "destination": "/public/$1"
+      "source": "/api/streamers/live",
+      "destination": "https://sabdice.com/api/streamers/live"
+    },
+    {
+      "source": "/api/streamers",
+      "destination": "https://sabdice.com/api/streamers"
+    },
+    {
+      "source": "/api/live-rolls",
+      "destination": "https://sabdice.com/api/rolls/public"
+    },
+    {
+      "source": "/api/player-rolls/:username",
+      "destination": "https://sabdice.com/api/rolls/public?q=:username"
+    },
+    {
+      "source": "/api/sab/:path*",
+      "destination": "https://sabdice.com/api/:path*"
     }
   ]
 }
