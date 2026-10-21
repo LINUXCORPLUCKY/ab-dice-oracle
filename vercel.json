@@ -4,6 +4,14 @@
   "cleanUrls": true,
   "rewrites": [
     {
+      "source": "/api/v1/everything",
+      "destination": "/api/v1/everything.js"
+    },
+    {
+      "source": "/api/v1/all",
+      "destination": "/api/v1/everything.js"
+    },
+    {
       "source": "/api/v1/stream",
       "destination": "/api/v1/stream.js"
     },

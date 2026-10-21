@@ -10,6 +10,7 @@ const predictHandler = require('./api/v1/predict');
 const liveRollsHandler = require('./api/v1/live-rolls');
 const keysHandler = require('./api/v1/keys');
 const indexApiHandler = require('./api/v1/index');
+const everythingHandler = require('./api/v1/everything');
 
 const PORT = process.env.PORT || 3005;
 const PUBLIC_DIR = path.join(__dirname, 'public');
@@ -66,6 +67,10 @@ const server = http.createServer(async (req, res) => {
   const pathname = parsedUrl.pathname;
 
   // 1. COMMERCIAL API V1 ENDPOINTS
+  if (pathname === '/api/v1/everything' || pathname === '/api/v1/all') {
+    return await everythingHandler(req, res);
+  }
+
   if (pathname === '/api/v1/stream' || pathname === '/api/stream') {
     return await streamHandler(req, res);
   }
