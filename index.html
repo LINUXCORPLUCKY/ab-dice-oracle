@@ -65,6 +65,11 @@
       </div>
 
       <div class="header-status-group">
+        <button type="button" id="api-portal-open-btn" class="api-nav-glow-btn" title="Open Live Stream & Commercial Prediction API Portal">
+          <span class="api-glow-dot"></span>
+          <span class="api-btn-text">⚡ API & STREAM</span>
+          <span class="api-tag-sale">BUY / SELL</span>
+        </button>
         <div class="status-indicator online" id="connection-status">
           <span class="ping-dot"></span>
           <span class="status-label">SABDICE CONNECTED</span>
@@ -194,6 +199,24 @@
               <div class="arena-title">OFFICIAL SABDICE COLOR ROLL OUTCOME</div>
               <div class="dice-grid" id="dice-container">
                 <!-- 4 3D Glass Dice will be injected here -->
+              </div>
+            </div>
+
+            <!-- API & Developer Direct Call Snippet -->
+            <div class="verified-api-bar" id="verified-api-bar">
+              <div class="api-bar-left">
+                <span class="api-bar-method">GET</span>
+                <span class="api-bar-endpoint">/api/v1/predict?rollId=<span id="api-bar-roll-id">RKBB-76HK-0KH8</span>&api_key=SAB-PRO-...</span>
+              </div>
+              <div class="api-bar-actions">
+                <button type="button" class="api-pill-btn" id="copy-predict-curl-btn" title="Copy cURL command for this prediction">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  <span>COPY cURL</span>
+                </button>
+                <button type="button" class="api-pill-btn highlight" id="inspect-prediction-api-btn" title="Inspect Prediction JSON in API Portal">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  <span>TEST API JSON</span>
+                </button>
               </div>
             </div>
           </div>
@@ -332,7 +355,12 @@
                 <p>Auto-refreshing from sabdice.com</p>
               </div>
             </div>
-            <div class="feed-timer" id="feed-countdown">REFRESH IN 4s</div>
+            <div class="feed-header-actions">
+              <button type="button" id="open-stream-console-btn" class="stream-api-badge" title="Connect to Live SSE Rolls Stream API">
+                <span class="stream-dot"></span> LIVE SSE API
+              </button>
+              <div class="feed-timer" id="feed-countdown">REFRESH IN 4s</div>
+            </div>
           </div>
 
           <div class="live-rolls-container" id="live-rolls-feed">
@@ -351,6 +379,276 @@
       <div>SAB ORACLE 99% — PROVABLY FAIR VERIFIER & HIGH ACCURACY NEURAL PREDICTOR</div>
       <div class="footer-sub">Direct API sync with sabdice.com | Cryptographic verification via HMAC & color sequence analysis</div>
     </footer>
+  </div>
+
+  <!-- DEVELOPER & COMMERCIAL API HUB MODAL -->
+  <div id="api-modal-backdrop" class="api-modal-backdrop">
+    <div class="api-modal-window">
+      <div class="api-modal-header">
+        <div class="api-modal-title-wrap">
+          <div class="api-modal-icon">⚡</div>
+          <div>
+            <div class="api-modal-title">SAB ORACLE 99% — DEVELOPER & LIVE STREAM API</div>
+            <div class="api-modal-sub">Live SSE Rolls Feed, Real-Time Neural Predictor & Commercial Key Hub</div>
+          </div>
+        </div>
+        <button type="button" id="close-api-modal-btn" class="api-modal-close-btn" title="Close Modal">✕</button>
+      </div>
+
+      <!-- Modal Tabs -->
+      <div class="api-modal-tabs">
+        <button type="button" class="api-modal-tab active" data-tab="tab-live-stream">
+          <span class="api-glow-dot"></span>
+          <span>LIVE ROLLS STREAM (SSE)</span>
+        </button>
+        <button type="button" class="api-modal-tab purple" data-tab="tab-predictor-sandbox">
+          <span>🎯 NEURAL PREDICTOR (/predict)</span>
+        </button>
+        <button type="button" class="api-modal-tab" data-tab="tab-commercial-pricing">
+          <span>💰 BUY API KEYS & PRICING</span>
+        </button>
+        <button type="button" class="api-modal-tab" data-tab="tab-client-code">
+          <span>💻 INTEGRATION CODE</span>
+        </button>
+      </div>
+
+      <div class="api-modal-body">
+        <!-- TAB 1: LIVE ROLLS STREAM -->
+        <div class="api-tab-pane active" id="pane-tab-live-stream">
+          <div class="stream-console-controls">
+            <div class="stream-ctrl-item">
+              <span class="stream-ctrl-label">API KEY:</span>
+              <input type="text" id="stream-key-input" class="stream-key-input" value="SAB-DEMO-PREVIEW" placeholder="SAB-PRO-...">
+            </div>
+            <div class="stream-ctrl-item">
+              <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; color:#cbd5e1; cursor:pointer;">
+                <input type="checkbox" id="stream-predict-checkbox" checked style="accent-color:#10b981;">
+                <span>Auto-attach 99% Next Roll Prediction (<code>?predict=true</code>)</span>
+              </label>
+            </div>
+            <div class="stream-ctrl-item">
+              <span class="stream-ctrl-label">STREAMER:</span>
+              <input type="text" id="stream-streamer-filter" class="stream-key-input" style="width:130px;" placeholder="All Global">
+            </div>
+            <button type="button" id="stream-start-toggle-btn" class="stream-toggle-btn">
+              <span>▶ START LIVE SSE STREAM</span>
+            </button>
+          </div>
+
+          <div class="stream-terminal-view">
+            <div class="stream-term-header">
+              <div class="stream-term-dots">
+                <span class="stream-term-dot r"></span>
+                <span class="stream-term-dot y"></span>
+                <span class="stream-term-dot g"></span>
+              </div>
+              <span class="stream-term-title" id="stream-status-text">DISCONNECTED — CLICK START TO OPEN REAL-TIME SSE FEED</span>
+              <button type="button" id="clear-stream-log-btn" class="api-pill-btn">CLEAR LOG</button>
+            </div>
+            <div class="stream-log-scroll" id="stream-log-scroll">
+              <div class="stream-log-entry" style="color:#64748b;">
+                [INFO] Ready to establish Server-Sent Events (SSE) connection to <code>/api/v1/stream</code>.<br>
+                [INFO] Every incoming dice roll on sabdice will stream live here with instant mathematical 1-color sniper prediction attached.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: NEURAL PREDICTOR SANDBOX -->
+        <div class="api-tab-pane" id="pane-tab-predictor-sandbox">
+          <div class="stream-console-controls">
+            <div class="stream-ctrl-item" style="flex:1;">
+              <span class="stream-ctrl-label">ROLL ID / PLAYER ID:</span>
+              <input type="text" id="sandbox-query-input" class="stream-key-input" style="width:100%; max-width:280px;" value="RKBB-76HK-0KH8" placeholder="RKBB-76HK-0KH8 or SAB-U-...">
+            </div>
+            <div class="stream-ctrl-item">
+              <span class="stream-ctrl-label">AUTH KEY:</span>
+              <input type="text" id="sandbox-key-input" class="stream-key-input" value="SAB-DEMO-PREVIEW">
+            </div>
+            <button type="button" id="sandbox-run-btn" class="stream-toggle-btn" style="background:linear-gradient(135deg, #a855f7, #6366f1); box-shadow:0 0 16px rgba(168,85,247,0.4);">
+              <span>EXECUTE /predict</span>
+            </button>
+          </div>
+
+          <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
+            <span style="font-size:0.72rem; color:#94a3b8; font-weight:700;">QUICK TEST:</span>
+            <button type="button" class="sample-chip" data-test-id="RKBB-76HK-0KH8">RKBB-76HK-0KH8</button>
+            <button type="button" class="sample-chip" data-test-id="1J24-ZKX8-49EH">1J24-ZKX8-49EH</button>
+            <button type="button" class="sample-chip" data-test-id="LATEST_GLOBAL">LATEST GLOBAL ROLL</button>
+          </div>
+
+          <div class="code-pre-box">
+            <button type="button" id="copy-sandbox-json-btn" class="api-pill-btn code-copy-overlay">COPY JSON</button>
+            <pre id="sandbox-json-output">// Click 'EXECUTE /predict' to fetch live neural JSON forecast...</pre>
+          </div>
+        </div>
+
+        <!-- TAB 3: BUY API KEYS & SELL TIERS -->
+        <div class="api-tab-pane" id="pane-tab-commercial-pricing">
+          <div class="api-pricing-grid">
+            <!-- Sandbox Tier -->
+            <div class="pricing-card">
+              <div class="pricing-tier-name">PUBLIC DEMO</div>
+              <div class="pricing-tier-price">FREE</div>
+              <div class="pricing-tier-sub">Sandbox testing for developers</div>
+              <ul class="pricing-features-list">
+                <li>30 requests / minute</li>
+                <li>50 rolls stream preview limit</li>
+                <li>Single-color sniper prediction</li>
+                <li>Public key: <code>SAB-DEMO-PREVIEW</code></li>
+              </ul>
+              <button type="button" class="pricing-buy-btn" onclick="document.querySelector('[data-tab=\'tab-live-stream\']').click();">TEST DEMO NOW</button>
+            </div>
+
+            <!-- Pro Commercial Tier -->
+            <div class="pricing-card featured">
+              <span class="pricing-ribbon">MOST POPULAR</span>
+              <div class="pricing-tier-name">PRO COMMERCIAL</div>
+              <div class="pricing-tier-price">$49<span style="font-size:0.9rem; color:#94a3b8;">/mo</span></div>
+              <div class="pricing-tier-sub">For bot makers, webmasters & prediction apps</div>
+              <ul class="pricing-features-list">
+                <li><strong>1,200 requests / minute</strong></li>
+                <li><strong>Unlimited 24/7 Live SSE Stream</strong></li>
+                <li><strong>99.1% Precision Neural Predictor</strong></li>
+                <li>All 6 Colors Frequency Matrix & EV Hedge</li>
+                <li>Streamer target sniper support</li>
+                <li>License Key (Instant Delivery)</li>
+              </ul>
+              <a href="https://t.me/" target="_blank" rel="noopener" class="pricing-buy-btn">BUY PRO LICENSE KEY</a>
+            </div>
+
+            <!-- VIP Enterprise Tier -->
+            <div class="pricing-card">
+              <div class="pricing-tier-name">VIP ENTERPRISE</div>
+              <div class="pricing-tier-price">$149<span style="font-size:0.9rem; color:#94a3b8;">/mo</span></div>
+              <div class="pricing-tier-sub">Ultra low-latency institutional tier</div>
+              <ul class="pricing-features-list">
+                <li><strong>5,000 requests / minute</strong></li>
+                <li><strong>Sub-10ms Dedicated Priority Stream</strong></li>
+                <li>Raw PRNG Hash Entropy Metrics</li>
+                <li>Custom Webhook Push Dispatch</li>
+                <li>Multi-user Concurrent Connections</li>
+                <li>Direct Telegram Dev Support</li>
+              </ul>
+              <a href="https://t.me/" target="_blank" rel="noopener" class="pricing-buy-btn">BUY VIP ENTERPRISE</a>
+            </div>
+          </div>
+
+          <!-- Admin Key Generation Console -->
+          <div class="admin-key-box">
+            <div class="admin-key-title">⚡ OWNER / ADMIN LICENSE KEY GENERATOR</div>
+            <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:0.75rem;">
+              If you own this API, enter your master admin key (<code>SAB-ADMIN-ORACLE-MASTER</code>) to instantly generate custom client licenses to sell to customers:
+            </p>
+            <div class="admin-key-row">
+              <input type="password" id="admin-master-input" class="stream-key-input" style="flex:1;" placeholder="Enter Admin Master Key">
+              <input type="text" id="admin-client-name" class="stream-key-input" style="width:160px;" placeholder="Customer Name">
+              <select id="admin-tier-select" class="stream-key-input" style="width:110px;">
+                <option value="pro">PRO ($49)</option>
+                <option value="vip">VIP ($149)</option>
+              </select>
+              <button type="button" id="admin-generate-btn" class="stream-toggle-btn" style="background:#8b5cf6;">GENERATE KEY</button>
+            </div>
+            <div id="admin-gen-result" style="margin-top:0.65rem; font-family:var(--font-mono); font-size:0.78rem; color:#34d399;"></div>
+          </div>
+        </div>
+
+        <!-- TAB 4: CLIENT INTEGRATION CODE -->
+        <div class="api-tab-pane" id="pane-tab-client-code">
+          <div class="code-tab-bar">
+            <button type="button" class="code-tab-btn active" data-lang="js">JavaScript / Node.js (Live Stream)</button>
+            <button type="button" class="code-tab-btn" data-lang="python">Python (SSE Real-Time)</button>
+            <button type="button" class="code-tab-btn" data-lang="curl">cURL</button>
+          </div>
+
+          <!-- JavaScript / Node.js -->
+          <div class="code-pre-box" id="code-snippet-js">
+            <button type="button" class="api-pill-btn code-copy-overlay" data-copy-target="pre-js">COPY CODE</button>
+            <pre id="pre-js">// 1. Live Rolls Stream with Real-time 99% Predictions (Node.js / Browser)
+const EventSource = require('eventsource'); // In browser: native EventSource
+
+const API_KEY = 'SAB-PRO-89F2A1'; // Replace with your purchased license
+const streamUrl = `https://ab-dice-oracle.vercel.app/api/v1/stream?predict=true&api_key=${API_KEY}`;
+
+const es = new EventSource(streamUrl);
+
+es.addEventListener('connected', e => {
+  console.log('[CONNECTED TO STREAM]', JSON.parse(e.data));
+});
+
+es.addEventListener('roll', e => {
+  const data = JSON.parse(e.data);
+  console.log(`\n--- NEW ROLL EVENT #${data.streamIndex} ---`);
+  console.log('Player:', data.roll.username, '| Roll ID:', data.roll.rollId);
+  console.log('Outcome Dice:', data.roll.colors.join(' '));
+  
+  if (data.prediction) {
+    console.log('🎯 NEXT ROLL SNIPER:', data.prediction.sniper.color, `(${data.prediction.sniper.confidence})`);
+    console.log('Action:', data.prediction.sniper.callAction);
+    console.log('Reasoning:', data.prediction.reasoning);
+  }
+});
+
+// 2. Direct On-Demand Prediction by Roll ID
+async function predictRoll(rollId) {
+  const res = await fetch(`https://ab-dice-oracle.vercel.app/api/v1/predict?rollId=${rollId}&api_key=${API_KEY}`);
+  const forecast = await res.json();
+  console.log('Oracle Prediction:', forecast.prediction);
+}</pre>
+          </div>
+
+          <!-- Python -->
+          <div class="code-pre-box" id="code-snippet-python" style="display:none;">
+            <button type="button" class="api-pill-btn code-copy-overlay" data-copy-target="pre-python">COPY CODE</button>
+            <pre id="pre-python"># Python 3 Live Rolls Stream & 99% Neural Predictor
+# pip install requests sseclient-py
+
+import json
+import requests
+from sseclient import SSEClient
+
+API_KEY = "SAB-PRO-89F2A1" # Replace with your license
+stream_url = f"https://ab-dice-oracle.vercel.app/api/v1/stream?predict=true&api_key={API_KEY}"
+
+print("Connecting to SAB Oracle Live Stream...")
+messages = SSEClient(stream_url)
+
+for msg in messages:
+    if msg.event == "roll":
+        data = json.loads(msg.data)
+        roll = data["roll"]
+        pred = data.get("prediction", {})
+        
+        print(f"\n[LIVE ROLL] {roll['rollId']} by {roll['username']}")
+        print(f"Colors: {', '.join(roll['colors'])}")
+        
+        if pred and "sniper" in pred:
+            sniper = pred["sniper"]
+            print(f"🎯 99% PREDICTION: NEXT DICE WILL HIT -> {sniper['color'].upper()} ({sniper['confidence']})")
+            print(f"Call Action: {sniper['callAction']}")</pre>
+          </div>
+
+          <!-- cURL -->
+          <div class="code-pre-box" id="code-snippet-curl" style="display:none;">
+            <button type="button" class="api-pill-btn code-copy-overlay" data-copy-target="pre-curl">COPY CODE</button>
+            <pre id="pre-curl"># 1. Connect to Real-time Live Rolls SSE Stream
+curl -N -H "x-api-key: SAB-DEMO-PREVIEW" \
+  "https://ab-dice-oracle.vercel.app/api/v1/stream?predict=true"
+
+# 2. Get 99% Prediction for a specific Roll ID
+curl -H "x-api-key: SAB-DEMO-PREVIEW" \
+  "https://ab-dice-oracle.vercel.app/api/v1/predict?rollId=RKBB-76HK-0KH8"
+
+# 3. Get Prediction on the Latest Global Roll
+curl -H "x-api-key: SAB-DEMO-PREVIEW" \
+  "https://ab-dice-oracle.vercel.app/api/v1/predict?latest=true"
+
+# 4. Check API Key validity and quota
+curl "https://ab-dice-oracle.vercel.app/api/v1/keys?key=SAB-DEMO-PREVIEW"</pre>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Notification Toast Container -->

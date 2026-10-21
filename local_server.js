@@ -4,6 +4,13 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
+// Import modular API handlers
+const streamHandler = require('./api/v1/stream');
+const predictHandler = require('./api/v1/predict');
+const liveRollsHandler = require('./api/v1/live-rolls');
+const keysHandler = require('./api/v1/keys');
+const indexApiHandler = require('./api/v1/index');
+
 const PORT = process.env.PORT || 3005;
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
@@ -15,6 +22,7 @@ const MIME_TYPES = {
   '.json': 'application/json; charset=UTF-8',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon'
 };
@@ -34,7 +42,7 @@ function proxySabDice(remotePath, res) {
       'Content-Type': remoteRes.headers['content-type'] || 'application/json',
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key'
     });
     remoteRes.pipe(res);
   }).on('error', err => {
@@ -43,13 +51,13 @@ function proxySabDice(remotePath, res) {
   });
 }
 
-const server = http.createServer((req, res) => {
-  // CORS Preflight
+const server = http.createServer(async (req, res) => {
+  // Global CORS Preflight
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key'
     });
     return res.end();
   }
@@ -57,27 +65,44 @@ const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const pathname = parsedUrl.pathname;
 
-  // API Proxy endpoints
+  // 1. COMMERCIAL API V1 ENDPOINTS
+  if (pathname === '/api/v1/stream' || pathname === '/api/stream') {
+    return await streamHandler(req, res);
+  }
+
+  if (pathname === '/api/v1/predict' || pathname === '/api/predict') {
+    return await predictHandler(req, res);
+  }
+
+  if (pathname === '/api/v1/live-rolls') {
+    return await liveRollsHandler(req, res);
+  }
+
+  if (pathname === '/api/v1/keys') {
+    return await keysHandler(req, res);
+  }
+
+  if (pathname === '/api/v1' || pathname === '/api/v1/') {
+    return indexApiHandler(req, res);
+  }
+
+  // 2. LEGACY / DIRECT SABDICE PROXY ENDPOINTS
   if (pathname.startsWith('/api/sab/')) {
-    // Forward /api/sab/rolls/verify/:id -> /api/rolls/verify/:id
     const targetPath = pathname.replace('/api/sab', '/api') + (parsedUrl.search || '');
     return proxySabDice(targetPath, res);
   }
 
-  // Direct roll verification proxy: /api/verify/:rollId
   if (pathname.startsWith('/api/verify/')) {
     const rollId = pathname.replace('/api/verify/', '').trim();
     return proxySabDice(`/api/rolls/verify/${encodeURIComponent(rollId)}`, res);
   }
 
-  // Direct Player ID / Verification ID proxy: /api/user/:playerId
   if (pathname.startsWith('/api/user/')) {
     const playerId = pathname.replace('/api/user/', '').trim();
     const query = parsedUrl.search || '?limit=50';
     return proxySabDice(`/api/rolls/users/${encodeURIComponent(playerId)}${query}`, res);
   }
 
-  // Streamers endpoints: /api/streamers and /api/streamers/live
   if (pathname === '/api/streamers') {
     return proxySabDice('/api/streamers', res);
   }
@@ -85,31 +110,33 @@ const server = http.createServer((req, res) => {
     return proxySabDice('/api/streamers/live', res);
   }
 
-  // Direct live public rolls proxy: /api/live-rolls
   if (pathname === '/api/live-rolls') {
     const query = parsedUrl.search || '?limit=100';
     return proxySabDice(`/api/rolls/public${query}`, res);
   }
 
-  // Direct player history proxy: /api/player-rolls/:username
   if (pathname.startsWith('/api/player-rolls/')) {
     const username = pathname.replace('/api/player-rolls/', '').trim();
     return proxySabDice(`/api/rolls/public?limit=100&q=${encodeURIComponent(username)}`, res);
   }
 
-  // Static File Serving
+  // 3. STATIC FILE SERVING
   let filePath = path.join(PUBLIC_DIR, pathname === '/' ? 'index.html' : pathname);
-  
-  // Safe path check
-  if (!filePath.startsWith(PUBLIC_DIR)) {
-    res.writeHead(403);
-    return res.end('Forbidden');
+
+  // Fallback to root directory if not in public
+  if (!fs.existsSync(filePath)) {
+    const rootPath = path.join(__dirname, pathname === '/' ? 'index.html' : pathname);
+    if (fs.existsSync(rootPath)) {
+      filePath = rootPath;
+    }
   }
 
   fs.stat(filePath, (err, stats) => {
     if (err || !stats.isFile()) {
-      // Fallback to index.html for SPA routing
       filePath = path.join(PUBLIC_DIR, 'index.html');
+      if (!fs.existsSync(filePath)) {
+        filePath = path.join(__dirname, 'index.html');
+      }
     }
 
     const ext = path.extname(filePath).toLowerCase();
@@ -128,4 +155,6 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(`[ SAB ORACLE PREDICTOR ] Server active on http://localhost:${PORT}`);
+  console.log(`[ API STREAM ] Live rolls SSE: http://localhost:${PORT}/api/v1/stream?predict=true&api_key=SAB-DEMO-PREVIEW`);
+  console.log(`[ API PREDICT ] Neural Predictor: http://localhost:${PORT}/api/v1/predict?latest=true&api_key=SAB-DEMO-PREVIEW`);
 });

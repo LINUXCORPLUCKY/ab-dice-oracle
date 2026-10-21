@@ -4,6 +4,34 @@
   "cleanUrls": true,
   "rewrites": [
     {
+      "source": "/api/v1/stream",
+      "destination": "/api/v1/stream.js"
+    },
+    {
+      "source": "/api/v1/predict",
+      "destination": "/api/v1/predict.js"
+    },
+    {
+      "source": "/api/v1/live-rolls",
+      "destination": "/api/v1/live-rolls.js"
+    },
+    {
+      "source": "/api/v1/keys",
+      "destination": "/api/v1/keys.js"
+    },
+    {
+      "source": "/api/v1",
+      "destination": "/api/v1/index.js"
+    },
+    {
+      "source": "/api/stream",
+      "destination": "/api/v1/stream.js"
+    },
+    {
+      "source": "/api/predict",
+      "destination": "/api/v1/predict.js"
+    },
+    {
       "source": "/api/verify/:rollId",
       "destination": "https://sabdice.com/api/rolls/verify/:rollId"
     },
